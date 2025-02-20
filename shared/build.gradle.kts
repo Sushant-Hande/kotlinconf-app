@@ -113,6 +113,10 @@ kotlin {
                 implementation(libs.androidx.preference)
                 implementation(libs.compose.ui.tooling.preview)
                 implementation(libs.ktor.client.okhttp)
+
+                implementation(libs.androidx.navigation3)
+                implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+                implementation(libs.androidx.lifecycle.viewmodel.ktx)
             }
         }
 

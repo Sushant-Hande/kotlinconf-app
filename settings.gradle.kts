@@ -20,6 +20,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven("https://packages.jetbrains.team/maven/p/firework/dev")
+        maven("https://androidx.dev/snapshots/builds/13015048/artifacts/repository")
     }
 }
 
