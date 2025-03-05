@@ -207,10 +207,6 @@ class ConferenceService(
         }
     }
 
-    fun partnerDescription(name: String): String {
-        return PARTNER_DESCRIPTIONS[name] ?: ""
-    }
-
     private fun scheduleNotification(session: SessionCardView) {
         val start = session.startsAt
         val end = session.endsAt
