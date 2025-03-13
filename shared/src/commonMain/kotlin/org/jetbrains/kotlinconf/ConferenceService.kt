@@ -77,7 +77,15 @@ class ConferenceService(
             conference.buildAgenda(favorites, votes, time)
         }.stateIn(scope, SharingStarted.Eagerly, Agenda())
 
-    private val sessionCards: StateFlow<List<SessionCardView>> =
+    val keyEvents: StateFlow<KeyEvents> =
+        combine(
+            storage.getConferenceCache(),
+            timeProvider.time,
+        ) { conference, time ->
+            conference.buildKeyEvents(time)
+        }.stateIn(scope, SharingStarted.Eagerly, KeyEvents())
+
+    val sessionCards: StateFlow<List<SessionCardView>> =
         agenda.map {
             it.days
                 .flatMap { it.timeSlots }

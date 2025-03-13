@@ -15,6 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import org.jetbrains.compose.reload.DevelopmentEntryPoint
 import org.jetbrains.kotlinconf.navigation.KotlinConfNavHost
+import org.jetbrains.kotlinconf.screens.AboutConferenceViewModel
 import org.jetbrains.kotlinconf.screens.NewsDetailViewModel
 import org.jetbrains.kotlinconf.screens.NewsListViewModel
 import org.jetbrains.kotlinconf.screens.PrivacyPolicyViewModel
@@ -90,6 +91,7 @@ private fun koinConfiguration(platformModule: Module) = koinConfiguration {
     }
 
     val viewModelModule = module {
+        viewModelOf(::AboutConferenceViewModel)
         viewModelOf(::PrivacyPolicyViewModel)
         viewModelOf(::ScheduleViewModel)
         viewModelOf(::SessionViewModel)

@@ -3,6 +3,7 @@ package org.jetbrains.kotlinconf.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,10 +12,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,9 +57,10 @@ import org.jetbrains.kotlinconf.SpeakerId
 import org.jetbrains.kotlinconf.ui.components.DayHeader
 import org.jetbrains.kotlinconf.ui.components.Divider
 import org.jetbrains.kotlinconf.ui.components.PageMenuItem
-import org.jetbrains.kotlinconf.ui.components.SpeakerCard
+import org.jetbrains.kotlinconf.ui.components.SpeakerAvatar
 import org.jetbrains.kotlinconf.ui.components.StyledText
 import org.jetbrains.kotlinconf.ui.theme.KotlinConfTheme
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun AboutConference(
@@ -65,6 +69,7 @@ fun AboutConference(
     onWebsiteLink: () -> Unit,
     onBack: () -> Unit,
     onSpeaker: (SpeakerId) -> Unit,
+    aboutConferenceViewModel: AboutConferenceViewModel = koinViewModel(),
 ) {
     val scrollState = rememberScrollState()
     ScrollToTopHandler(scrollState)
@@ -88,21 +93,36 @@ fun AboutConference(
         Column(
             verticalArrangement = Arrangement.spacedBy(48.dp),
         ) {
+            for (event in aboutConferenceViewModel.events.collectAsState().value) {
+                Event(
+                    month = event.month,
+                    day = event.day,
+                    line1 = event.title.substringBeforeLast(' '),
+                    line2 = event.title.substringAfterLast(' '),
+                    description = event.description,
+                    speakers = event.speakers,
+                    location = event.locationLine,
+                    time = event.timeLine,
+                    onSpeaker = onSpeaker,
+                )
+            }
             // TODO retrieve data from the service
-            Event(
-                month = "MAY",
-                day = "22",
-                line1 = stringResource(Res.string.about_conference_day1_title_line1),
-                line2 = stringResource(Res.string.about_conference_day1_title_line2),
-                description = "",
-                speakers = listOf(
-                    Speaker(SpeakerId("0"), "Hadi Hariri", "", "Never believed in elevator pitches", ""),
-                    Speaker(SpeakerId("1"), "Hadi Hariri", "", "Never believed in elevator pitches", ""),
-                ),
-                location = "Hall A",
-                time = "10:00 – 11:00",
-                onSpeaker = onSpeaker,
-            )
+/*
+            val firstKeynote = aboutConferenceViewModel.firstDayKeynote.collectAsState().value
+            if (firstKeynote != null) {
+                Event(
+                    month = firstKeynote.month,
+                    day = firstKeynote.day,
+                    line1 = stringResource(Res.string.about_conference_day1_title_line1),
+                    line2 = stringResource(Res.string.about_conference_day1_title_line2),
+                    description = firstKeynote.description,
+                    speakers = firstKeynote.speakers,
+                    location = firstKeynote.locationLine,
+                    time = firstKeynote.timeLine,
+                    onSpeaker = onSpeaker,
+                )
+            }
+*/
 
             Event(
                 month = "MAY",
@@ -215,13 +235,29 @@ private fun Event(
 
         for (speaker in speakers) {
             key(speaker.id) {
-                SpeakerCard(
-                    name = speaker.name,
-                    title = speaker.description,
-                    photoUrl = speaker.photoUrl,
-                    modifier = Modifier.padding(horizontal = 12.dp).fillMaxWidth(),
-                    onClick = { onSpeaker(speaker.id) },
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp).clip(RoundedCornerShape(8.dp)).clickable(onClick = { onSpeaker(speaker.id) }),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    SpeakerAvatar(
+                        photoUrl = speaker.photoUrl,
+                        modifier = Modifier.size(96.dp),
+                    )
+                    Column {
+                        StyledText(
+                            text = speaker.name,
+                            style = KotlinConfTheme.typography.h3,
+                            color = KotlinConfTheme.colors.primaryText,
+                        )
+                        Spacer(modifier = Modifier.size(6.dp))
+                        StyledText(
+                            text = speaker.position,
+                            style = KotlinConfTheme.typography.text2,
+                            color = KotlinConfTheme.colors.secondaryText,
+                        )
+                    }
+                }
             }
         }
 

@@ -8,6 +8,10 @@ data class Agenda(
     val days: List<Day> = emptyList()
 )
 
+data class KeyEvents(
+    val events: List<SessionCardView> = emptyList()
+)
+
 data class Speakers(
     val all: List<Speaker> = emptyList()
 ) {
@@ -54,6 +58,16 @@ fun Conference.buildAgenda(
         .sortedBy { it.date }
 
     return Agenda(days)
+}
+
+fun Conference.buildKeyEvents(
+    now: LocalDateTime,
+): KeyEvents {
+    val events = sessions
+        .filter { "Keynote" in it.title }
+        .sortedBy { it.startsAt }
+        .map { it.asSessionCard(this, now, emptySet(), emptyList()) }
+    return KeyEvents(events)
 }
 
 fun List<Session>.groupByTime(
